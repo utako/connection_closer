@@ -1,19 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 )
 
 func main() {
-	http.HandleFunc("/", good_app)
+	http.HandleFunc("/", internal_server_error)
 	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func good_app(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "good app.")
+func internal_server_error(res http.ResponseWriter, req *http.Request) {
+	http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
