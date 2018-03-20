@@ -11,10 +11,6 @@ import (
 func main() {
 	fmt.Print("Starting...\n")
 	http.HandleFunc("/", hello)
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
-	if err != nil {
-		panic(err)
-	}
 
 	s := &http.Server{
 		Addr:           ":" + os.Getenv("PORT"),
@@ -32,8 +28,8 @@ func hello(res http.ResponseWriter, req *http.Request) {
 }
 
 func ConnStateListener(c net.Conn, cs http.ConnState) {
-	if cs == http.StateNew {
-		fmt.Println("New connection! Closing.")
+	if cs == http.StateActive {
+		fmt.Println("Active connection! Closing.")
 		c.Close()
 	} else {
 		fmt.Printf("CONN STATE: %v, %v\n", cs, c)
