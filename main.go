@@ -3,36 +3,32 @@ package main
 import (
 	"fmt"
 	"net"
-	"net/http"
 	"os"
-	"time"
 )
 
 func main() {
-	fmt.Print("Starting...\n")
-	http.HandleFunc("/", hello)
+	fmt.Println("Starting...")
 
-	s := &http.Server{
-		Addr:           ":" + os.Getenv("PORT"),
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-		ConnState:      ConnStateListener,
+	l, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("PORT")))
+	if err != nil {
+		panic(err)
 	}
 
-	panic(s.ListenAndServe())
-}
+	fmt.Println("Past the listen... :)")
 
-func hello(res http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(res, "hello")
-}
+	for {
+		fmt.Println("about to accept connections")
+		conn, err := l.Accept()
+		fmt.Println("i've accepted connections")
+		if err != nil {
+			panic(err)
+		}
 
-func ConnStateListener(c net.Conn, cs http.ConnState) {
-	if cs == http.StateActive {
-		fmt.Println("Active connection! Closing.")
-		c.Close()
-	} else {
-		fmt.Printf("CONN STATE: %v, %v\n", cs, c)
+		fmt.Println("ain't gonna do anything")
+
+		go func(c net.Conn) {
+			fmt.Println("writing nothing")
+			c.Write([]byte{})
+		}(conn)
 	}
-	fmt.Printf("CONN STATE: %v, %v\n", cs, c)
 }
